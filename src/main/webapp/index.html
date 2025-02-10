@@ -1,0 +1,114 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Swagger Lite</title>
+    <style>
+        body { font-family: Arial, sans-serif; padding: 20px; }
+        table { width: 100%; border-collapse: collapse; margin-top: 20px; }
+        th, td { padding: 10px; border: 1px solid #ddd; text-align: left; }
+        th { background-color: #f4f4f4; }
+        .test-btn { cursor: pointer; padding: 5px 10px; background-color: blue; color: white; border: none; }
+        .response-box { margin-top: 10px; padding: 10px; border: 1px solid #ddd; background: #f9f9f9; }
+        textarea, input, select { width: 100%; padding: 5px; margin-top: 5px; }
+    </style>
+</head>
+<body>
+    <h2>Swagger Lite - API List</h2>
+    <table>
+        <thead>
+            <tr>
+                <th>API Name</th>
+                <th>URL</th>
+                <th>Methods</th>
+                <th>Test</th>
+            </tr>
+        </thead>
+        <tbody id="api-list"></tbody>
+    </table>
+
+    <h3>Select HTTP Method:</h3>
+    <select id="method-selector">
+        <option value="GET">GET</option>
+        <option value="POST">POST</option>
+    </select>
+
+    <h3>Selected Method:</h3>
+    <div id="selected-method" class="response-box">No request made yet.</div>
+
+    <h3>Request Headers:</h3>
+    <input id="request-header-key" type="text" placeholder="Header Key">
+    <input id="request-header-value" type="text" placeholder="Header Value">
+
+    <h3>Request Body (For POST Requests):</h3>
+    <textarea id="request-body" placeholder='{"key": "value"}'></textarea>
+
+    <h3>Response:</h3>
+    <div id="response" class="response-box">Click "Test" to see response</div>
+
+    <script>
+        async function fetchAPIList() {
+            const response = await fetch("api-list"); // Fetch from backend
+            const data = await response.json();
+            const table = document.getElementById("api-list");
+            table.innerHTML = "";
+
+            data.forEach(api => {
+                const row = document.createElement("tr");
+                row.innerHTML = `
+                    <td>${api.name}</td>
+                    <td><code>${api.url}</code></td>
+                    <td>${api.methods.join(", ")}</td>
+                    <td>
+                        <button class="test-btn" onclick="testAPI('${api.url}')">Test</button>
+                    </td>
+                `;
+                table.appendChild(row);
+            });
+        }
+
+        async function testAPI(url) {
+            try {
+                const method = document.getElementById("method-selector").value; // Get selected method
+                const fullUrl = window.location.origin + "/SwaggerLite" + url;
+                let options = { method: method, headers: {} };
+
+                // Display selected method before sending request
+                document.getElementById("selected-method").innerText = `Calling ${method} on ${url}`;
+
+                // Add header if provided
+                const headerKey = document.getElementById("request-header-key").value;
+                const headerValue = document.getElementById("request-header-value").value;
+                if (headerKey && headerValue) {
+                    options.headers[headerKey] = headerValue;
+                }
+
+                // Add request body if method is POST
+                if (method === "POST") {
+                    const requestBody = document.getElementById("request-body").value;
+                    options.headers["Content-Type"] = "application/json";
+                    options.body = requestBody;
+                }
+
+                const response = await fetch(fullUrl, options);
+                const contentType = response.headers.get("content-type");
+
+                let result;
+                if (contentType && contentType.includes("application/json")) {
+                    result = await response.json();
+                    result = JSON.stringify(result, null, 2);
+                } else {
+                    result = await response.text();
+                }
+
+                document.getElementById("response").innerText = result;
+            } catch (error) {
+                document.getElementById("response").innerText = "Request Failed: " + error;
+            }
+        }
+
+        fetchAPIList();
+    </script>
+</body>
+</html>
