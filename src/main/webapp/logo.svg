@@ -1,0 +1,83 @@
+<svg viewBox="0 0 300 120" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <!-- Dynamic gradient definition -->
+    <linearGradient id="blueGradient" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#001242"/>
+      <stop offset="50%" style="stop-color:#0066FF"/>
+      <stop offset="100%" style="stop-color:#00B4DB"/>
+    </linearGradient>
+    
+    <!-- Morphing pattern -->
+    <pattern id="techPattern" x="0" y="0" width="20" height="20" patternUnits="userSpaceOnUse">
+      <path d="M 0 10 L 10 0 L 20 10 L 10 20 Z" fill="none" stroke="#0066FF" stroke-width="0.5" opacity="0.3"/>
+    </pattern>
+  </defs>
+
+  <!-- Background -->
+  <rect width="300" height="120" fill="transparent"/>
+  
+  <!-- Main DNA-like helix structure -->
+  <path d="
+    M 50,60 
+    C 80,20 120,100 150,60 
+    C 180,20 220,100 250,60
+    " 
+    fill="none" 
+    stroke="url(#blueGradient)" 
+    stroke-width="8"
+    stroke-linecap="round"/>
+    
+  <!-- Intersecting geometric shapes -->
+  <path d="
+    M 100,40 
+    L 150,40 
+    L 200,80 
+    L 150,80 
+    Z" 
+    fill="#0066FF" 
+    opacity="0.1"/>
+    
+  <!-- Dynamic dots following the helix -->
+  <circle cx="50" cy="60" r="4" fill="#00B4DB">
+    <animate attributeName="cx" 
+             values="50;80;120;150;180;220;250;50" 
+             dur="3s" 
+             repeatCount="indefinite"/>
+    <animate attributeName="cy" 
+             values="60;20;100;60;20;100;60;60" 
+             dur="3s" 
+             repeatCount="indefinite"/>
+  </circle>
+
+  <!-- Abstract code brackets -->
+  <path d="M 30,30 L 45,45 L 30,60" fill="none" stroke="#001242" stroke-width="2"/>
+  <path d="M 270,30 L 255,45 L 270,60" fill="none" stroke="#001242" stroke-width="2"/>
+
+  <!-- Stylized text with dynamic underline -->
+  <text x="150" y="100" 
+        font-family="Arial, sans-serif" 
+        font-size="28" 
+        font-weight="bold" 
+        text-anchor="middle" 
+        fill="#001242"
+        letter-spacing="3">
+    STRIDE
+  </text>
+  
+  <path d="
+    M 100,105 
+    C 120,105 130,105 150,105 
+    C 170,105 180,105 200,105" 
+    fill="none" 
+    stroke="#00B4DB" 
+    stroke-width="2"
+    stroke-linecap="round">
+    <animate attributeName="d" 
+             values="
+               M 100,105 C 120,105 130,105 150,105 C 170,105 180,105 200,105;
+               M 100,105 C 120,103 130,107 150,105 C 170,103 180,107 200,105;
+               M 100,105 C 120,105 130,105 150,105 C 170,105 180,105 200,105"
+             dur="2s" 
+             repeatCount="indefinite"/>
+  </path>
+</svg>

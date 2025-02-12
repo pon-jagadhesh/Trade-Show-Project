@@ -1,6 +1,5 @@
 package com.jagger.utils;
 
-import java.lang.annotation.Annotation;
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.PreparedStatement;
@@ -9,8 +8,6 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
 import javax.servlet.annotation.WebServlet;
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
 
 import org.reflections.Reflections;
 import org.json.JSONArray;

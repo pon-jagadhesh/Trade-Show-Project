@@ -16,4 +16,3 @@ public class HelloServlet extends HttpServlet {
         response.getWriter().write("{\"message\": \"Hello, Swagger Lite!\"}");
     }
 }
-

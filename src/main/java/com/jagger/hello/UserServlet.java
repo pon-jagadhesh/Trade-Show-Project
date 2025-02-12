@@ -24,7 +24,7 @@ public class UserServlet extends HttpServlet {
 
         // Read request headers
         String customHeader = request.getHeader("Custom-Header");
-
+ 
         // Read JSON request body
         StringBuilder jsonBody = new StringBuilder();
         String line;

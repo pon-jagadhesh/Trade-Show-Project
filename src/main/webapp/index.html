@@ -3,112 +3,363 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Swagger Lite</title>
+    <title>Stride</title>
     <style>
-        body { font-family: Arial, sans-serif; padding: 20px; }
-        table { width: 100%; border-collapse: collapse; margin-top: 20px; }
-        th, td { padding: 10px; border: 1px solid #ddd; text-align: left; }
-        th { background-color: #f4f4f4; }
-        .test-btn { cursor: pointer; padding: 5px 10px; background-color: blue; color: white; border: none; }
-        .response-box { margin-top: 10px; padding: 10px; border: 1px solid #ddd; background: #f9f9f9; }
-        textarea, input, select { width: 100%; padding: 5px; margin-top: 5px; }
+        :root {
+            --primary-color: #6366f1;
+            --primary-hover: #4f46e5;
+            --secondary-color: #06b6d4;
+            --accent-color: #8b5cf6;
+            --success-color: #10b981;
+            --error-color: #ef4444;
+            --background-gradient: linear-gradient(135deg, #0f172a, #1e1b4b);
+            --surface-gradient: linear-gradient(145deg, #1e293b, #1e1b4b);
+            --text-primary: #f8fafc;
+            --text-secondary: #94a3b8;
+            --border-color: #3f3f46;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: system-ui, -apple-system, sans-serif;
+            background: var(--background-gradient);
+            color: var(--text-primary);
+            min-height: 100vh;
+            padding: 20px;
+            line-height: 1.6;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+            opacity: 0;
+            animation: fadeInScale 1s ease-out forwards;
+        }
+
+        h2 {
+            color: var(--secondary-color);
+            margin-bottom: 1.5rem;
+            font-size: 2rem;
+            text-shadow: 0 0 10px rgba(6, 182, 212, 0.3);
+            opacity: 0;
+            animation: slideInLeft 1s ease-out 0.3s forwards;
+        }
+
+        h3 {
+            color: var(--accent-color);
+            margin: 1.5rem 0 1rem;
+            opacity: 0;
+            animation: slideInLeft 1s ease-out 0.5s forwards;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: separate;
+            border-spacing: 0;
+            margin: 20px 0;
+            background: var(--surface-gradient);
+            border-radius: 8px;
+            overflow: hidden;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        }
+
+        th, td {
+            padding: 15px;
+            border: 1px solid var(--border-color);
+            text-align: left;
+        }
+
+        th {
+            background: rgba(99, 102, 241, 0.1);
+            color: var(--secondary-color);
+            font-weight: 600;
+            text-transform: uppercase;
+            font-size: 0.875rem;
+            letter-spacing: 0.05em;
+        }
+
+        tr {
+            opacity: 0;
+            animation: slideInRight 0.8s ease-out forwards;
+        }
+
+        .test-btn {
+            padding: 10px 20px;
+            background: linear-gradient(45deg, var(--primary-color), var(--secondary-color));
+            color: white;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            transition: all 0.3s ease;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .test-btn::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(
+                90deg,
+                transparent,
+                rgba(255, 255, 255, 0.2),
+                transparent
+            );
+            transition: 0.5s;
+        }
+
+        .test-btn:hover::before {
+            left: 100%;
+        }
+
+        .test-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(99, 102, 241, 0.2);
+        }
+
+        input, textarea, select {
+            width: 100%;
+            padding: 12px;
+            margin: 8px 0;
+            background: rgba(30, 41, 59, 0.8);
+            border: 2px solid var(--border-color);
+            border-radius: 6px;
+            color: var(--text-primary);
+            transition: all 0.3s ease;
+        }
+
+        select {
+            appearance: none;
+            background-image: linear-gradient(45deg, transparent 50%, var(--secondary-color) 50%),
+                            linear-gradient(135deg, var(--secondary-color) 50%, transparent 50%);
+            background-position: calc(100% - 20px) calc(1em + 2px),
+                            calc(100% - 15px) calc(1em + 2px);
+            background-size: 5px 5px,
+                           5px 5px;
+            background-repeat: no-repeat;
+            cursor: pointer;
+        }
+
+        input:focus, textarea:focus, select:focus {
+            outline: none;
+            border-color: var(--secondary-color);
+            box-shadow: 0 0 0 2px rgba(99, 102, 241, 0.2);
+        }
+
+        .response-box {
+            margin-top: 10px;
+            padding: 16px;
+            background: var(--surface-gradient);
+            border: 1px solid var(--border-color);
+            border-radius: 6px;
+            opacity: 0;
+            animation: fadeIn 0.8s ease-out forwards;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+
+        @keyframes fadeInScale {
+            0% {
+                opacity: 0;
+                transform: scale(0.95);
+            }
+            100% {
+                opacity: 1;
+                transform: scale(1);
+            }
+        }
+
+        @keyframes slideInLeft {
+            0% {
+                opacity: 0;
+                transform: translateX(-30px);
+            }
+            100% {
+                opacity: 1;
+                transform: translateX(0);
+            }
+        }
+
+        @keyframes slideInRight {
+            0% {
+                opacity: 0;
+                transform: translateX(30px);
+            }
+            100% {
+                opacity: 1;
+                transform: translateX(0);
+            }
+        }
+
+      
+        .loading {
+            position: relative;
+            overflow: hidden;
+        }
+
+        .loading::after {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(
+                90deg,
+                transparent,
+                rgba(99, 102, 241, 0.2),
+                transparent
+            );
+            animation: shine 1.5s infinite;
+        }
+
+        @keyframes shine {
+            to {
+                left: 100%;
+            }
+        }
+
+        @media (max-width: 768px) {
+            .container {
+                padding: 10px;
+            }
+
+            table {
+                display: block;
+                overflow-x: auto;
+            }
+
+            th, td {
+                min-width: 120px;
+            }
+
+            h2 {
+                font-size: 1.5rem;
+            }
+        }
+        /* select {
+    -webkit-appearance: none; 
+    -moz-appearance: none; 
+    appearance: none; 
+} */
+
     </style>
 </head>
 <body>
-    <h2>Swagger Lite - API List</h2>
-    <table>
-        <thead>
-            <tr>
-                <th>API Name</th>
-                <th>URL</th>
-                <th>Methods</th>
-                <th>Test</th>
-            </tr>
-        </thead>
-        <tbody id="api-list"></tbody>
-    </table>
+    <div class="container">
+        <h2>Stride - API List</h2>
+        
+       
 
-    <h3>Select HTTP Method:</h3>
-    <select id="method-selector">
-        <option value="GET">GET</option>
-        <option value="POST">POST</option>
-    </select>
+        <table>
+            <thead>
+                <tr>
+                    <th>API Name</th>
+                    <th>URL</th>
+                    <th>Methods</th>
+                    <th>Test</th>
+                </tr>
+            </thead>
+            <tbody id="api-list"></tbody>
+        </table>
+        <h3>Select HTTP Method</h3>
+        <select id="method-selector">
+            <option value="GET">GET</option>
+            <option value="POST">POST</option>
+            <option value="PUT">PUT</option>
+            <option value="DELETE">DELETE</option>
+        </select>
 
-    <h3>Selected Method:</h3>
-    <div id="selected-method" class="response-box">No request made yet.</div>
+        <h3>Request Headers</h3>
+        <input id="request-header-key" type="text" placeholder="Header Key">
+        <input id="request-header-value" type="text" placeholder="Header Value">
 
-    <h3>Request Headers:</h3>
-    <input id="request-header-key" type="text" placeholder="Header Key">
-    <input id="request-header-value" type="text" placeholder="Header Value">
+        <h3>Request Body (For POST Requests)</h3>
+        <textarea id="request-body" rows="5" placeholder='{"key": "value"}'></textarea>
 
-    <h3>Request Body (For POST Requests):</h3>
-    <textarea id="request-body" placeholder='{"key": "value"}'></textarea>
-
-    <h3>Response:</h3>
-    <div id="response" class="response-box">Click "Test" to see response</div>
+        <h3>Response</h3>
+        <div id="response" class="response-box">Click "Test" to see response</div>
+    </div>
 
     <script>
-        async function fetchAPIList() {
-            const response = await fetch("api-list"); // Fetch from backend
-            const data = await response.json();
-            const table = document.getElementById("api-list");
-            table.innerHTML = "";
+        const apis = [
+            {
+                name: "Users API",
+                url: "/api/users",
+                methods: ["GET", "POST"]
+            },
+            {
+                name: "Products API",
+                url: "/api/products",
+                methods: ["GET", "POST"]
+            },
+            {
+                name: "Orders API",
+                url: "/api/orders",
+                methods: ["GET"]
+            }
+        ];
 
-            data.forEach(api => {
-                const row = document.createElement("tr");
+
+        function initializeTable() {
+            const tableBody = document.getElementById('api-list');
+            tableBody.innerHTML = '';
+
+            apis.forEach((api, index) => {
+                const row = document.createElement('tr');
+                row.style.animationDelay = `${(index + 1) * 0.2}s`;
+                
                 row.innerHTML = `
                     <td>${api.name}</td>
-                    <td><code>${api.url}</code></td>
+                    <td>${api.url}</td>
                     <td>${api.methods.join(", ")}</td>
-                    <td>
-                        <button class="test-btn" onclick="testAPI('${api.url}')">Test</button>
-                    </td>
+                    <td><button class="test-btn" onclick="testAPI('${api.url}')">Test</button></td>
                 `;
-                table.appendChild(row);
+                
+                tableBody.appendChild(row);
             });
         }
 
         async function testAPI(url) {
+            const responseBox = document.getElementById('response');
+            responseBox.classList.add('loading');
+            
             try {
-                const method = document.getElementById("method-selector").value; // Get selected method
-                const fullUrl = window.location.origin + "/SwaggerLite" + url;
-                let options = { method: method, headers: {} };
-
-                // Display selected method before sending request
-                document.getElementById("selected-method").innerText = `Calling ${method} on ${url}`;
-
-                // Add header if provided
-                const headerKey = document.getElementById("request-header-key").value;
-                const headerValue = document.getElementById("request-header-value").value;
-                if (headerKey && headerValue) {
-                    options.headers[headerKey] = headerValue;
-                }
-
-                // Add request body if method is POST
-                if (method === "POST") {
-                    const requestBody = document.getElementById("request-body").value;
-                    options.headers["Content-Type"] = "application/json";
-                    options.body = requestBody;
-                }
-
-                const response = await fetch(fullUrl, options);
-                const contentType = response.headers.get("content-type");
-
-                let result;
-                if (contentType && contentType.includes("application/json")) {
-                    result = await response.json();
-                    result = JSON.stringify(result, null, 2);
-                } else {
-                    result = await response.text();
-                }
-
-                document.getElementById("response").innerText = result;
+                await new Promise(resolve => setTimeout(resolve, 1500));
+                
+                const method = document.getElementById('method-selector').value;
+                const response = {
+                    status: "success",
+                    method: method,
+                    url: url,
+                    timestamp: new Date().toISOString()
+                };
+ 
+                responseBox.innerText = JSON.stringify(response, null, 2);
             } catch (error) {
-                document.getElementById("response").innerText = "Request Failed: " + error;
+                responseBox.innerText = "Error: " + error.message;
+            } finally {
+                responseBox.classList.remove('loading');
             }
         }
 
-        fetchAPIList();
+
+        document.addEventListener('DOMContentLoaded', initializeTable);
     </script>
 </body>
 </html>
