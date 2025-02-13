@@ -1,95 +1,59 @@
 package com.jagger.utils;
 
-import java.lang.annotation.Annotation;
-import java.sql.Connection;
-import java.sql.DriverManager;
-import java.sql.PreparedStatement;
-import java.sql.ResultSet;
+
+import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
 import javax.servlet.annotation.WebServlet;
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
 
-import org.reflections.Reflections;
+
 import org.json.JSONArray;
 import org.json.JSONObject;
+import org.reflections.Reflections;
+import org.reflections.scanners.Scanners;
 
 public class ServletScanner {
-	
-    private static final String DB_URL = "jdbc:mysql://localhost:3306/swagger_lite";
-    private static final String DB_USER = "root";
-    private static final String DB_PASSWORD = "pass@123";
-    
-    public static void scanAndStoreServlets() {
-        try   { 
-        	Class.forName("com.mysql.cj.jdbc.Driver");
-        	Connection conn = DriverManager.getConnection(DB_URL, DB_USER, DB_PASSWORD);
-            Reflections reflections = new Reflections("com.jagger.hello");
-            Set<Class<?>> servlets = reflections.getTypesAnnotatedWith(WebServlet.class);
 
-            String insertSQL = "INSERT INTO api_metadata (name, url, methods) VALUES (?, ?, ?) ON DUPLICATE KEY UPDATE url=VALUES(url), methods=VALUES(methods)";
-            PreparedStatement stmt = conn.prepareStatement(insertSQL);
-            System.out.println("Scanning servlets...");
-            for (Class<?> servlet : servlets) {
-                WebServlet annotation = servlet.getAnnotation(WebServlet.class);
-                if (annotation != null) {
-                    String name = servlet.getSimpleName();
-                    String url = annotation.value()[0]; // First URL pattern
-                    String methods = String.join(", ", getHttpMethods(servlet));
+	public static JSONArray scanServlets() {
+	    JSONArray endpoints = new JSONArray();
 
-                    stmt.setString(1, name);
-                    stmt.setString(2, url);
-                    stmt.setString(3, methods);
-                    stmt.executeUpdate();
-                    
-                    System.out.println("Inserted: " + name + " | " + url + " | " + methods);
-                
-                }
-            }
-            stmt.close();
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-    }
+	    // Scan the entire root package 
+	    Reflections reflections = new Reflections("com", Scanners.TypesAnnotated);
 
+	    Set<Class<?>> servlets = reflections.getTypesAnnotatedWith(WebServlet.class);
+
+	    for (Class<?> servlet : servlets) {
+	        WebServlet annotation = servlet.getAnnotation(WebServlet.class);
+	        if (annotation != null) {
+	            JSONObject endpoint = new JSONObject();
+	            endpoint.put("name", servlet.getSimpleName());
+	            endpoint.put("url", annotation.value()[0]); // First URL pattern
+	            endpoint.put("methods", getHttpMethods(servlet));
+	            endpoints.put(endpoint);
+	        }
+	    }
+	    return endpoints;
+	}
     private static List<String> getHttpMethods(Class<?> servlet) {
         List<String> methods = new ArrayList<>();
         
         // Get all declared methods in the servlet class
-        java.lang.reflect.Method[] declaredMethods = servlet.getDeclaredMethods();
-
-        for (java.lang.reflect.Method method : declaredMethods) {
+        Method[] declaredMethods = servlet.getDeclaredMethods();
+        for (Method method : declaredMethods) {
             if (method.getName().equals("doGet")) {
                 methods.add("GET");
             }
             if (method.getName().equals("doPost")) {
                 methods.add("POST");
             }
-        }
-
-        return methods;
-    }
-    
-    public static JSONArray loadAPIsFromDatabase() {
-        JSONArray endpoints = new JSONArray();
-        try {
-        	Class.forName("com.mysql.cj.jdbc.Driver");
-        	Connection conn = DriverManager.getConnection(DB_URL, DB_USER, DB_PASSWORD);
-             PreparedStatement stmt = conn.prepareStatement("SELECT name, url, methods FROM api_metadata");
-             ResultSet rs = stmt.executeQuery();
-
-            while (rs.next()) {
-                JSONObject endpoint = new JSONObject();
-                endpoint.put("name", rs.getString("name"));
-                endpoint.put("url", rs.getString("url"));
-                endpoint.put("methods", rs.getString("methods").split(", "));
-                endpoints.put(endpoint);
+            if (method.getName().equals("doPut")) {
+                methods.add("PUT");
             }
-        } catch (Exception e) {
-            System.out.println(e.getMessage());
+            if (method.getName().equals("doDelete")) {
+                methods.add("DELETE");
+            }
         }
-        return endpoints;
+        return methods;
     }
 }

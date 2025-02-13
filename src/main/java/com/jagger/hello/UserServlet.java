@@ -13,14 +13,16 @@ public class UserServlet extends HttpServlet {
     private static final long serialVersionUID = 1L;
     
     protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
-        response.getWriter().write("Get from UserServlet");
+        
+    	response.getWriter().write("Get from UserServlet");
 
     }
     
 
     protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
-        response.setContentType("application/json");
-        response.setCharacterEncoding("UTF-8");
+        
+    	response.setContentType("application/json");
+
 
         // Read request headers
         String customHeader = request.getHeader("Custom-Header");

@@ -13,10 +13,11 @@ import com.jagger.utils.ServletScanner;
 public class ServletListServlet extends HttpServlet {
     private static final long serialVersionUID = 1L;
 
-	protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+    protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
         response.setContentType("application/json");
-        ServletScanner.scanAndStoreServlets();
-        JSONArray apis = ServletScanner.loadAPIsFromDatabase();
+        
+        // Scan and return APIs without storing in the database
+        JSONArray apis = ServletScanner.scanServlets();
         response.getWriter().write(apis.toString(2)); // Pretty print JSON
     }
 }
