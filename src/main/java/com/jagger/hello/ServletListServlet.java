@@ -14,10 +14,10 @@ public class ServletListServlet extends HttpServlet {
     private static final long serialVersionUID = 1L;
 
     protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
-        response.setContentType("application/json");
-        
+        response.setContentType("application/jso  n");
+        ServletScanner scanner = new ServletScanner();
         // Scan and return APIs without storing in the database
-        JSONArray apis = ServletScanner.scanServlets();
+        JSONArray apis = scanner.scanServlets();
         response.getWriter().write(apis.toString(2)); // Pretty print JSON
     }
 }
