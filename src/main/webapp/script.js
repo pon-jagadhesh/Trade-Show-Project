@@ -18,6 +18,7 @@ async function fetchAPIList() {
     });
 }
 
+
 function getSelectedMethod() {
     return document.getElementById("method-selector").value;
 }
@@ -46,47 +47,64 @@ function getRequestBody(method) {
 
 async function testAPI(url) {
     try {
-        const method = document.getElementById("method-selector").value; // Get selected method
-        const fullUrl = window.location.origin + "/SwaggerLite" + url;
-        let options = { method: method, headers: {} };
-        const requestParam= "?"+document.getElementById("request-param").value;
+        const method = getSelectedMethod();
+        let fullUrl = window.location.origin + "/SwaggerLite" + url;
+        let options = { method: method, headers: getRequestHeaders() };
 
         // Display selected method before sending request
         document.getElementById("selected-method").innerText = `Calling ${method} on ${url}`;
 
-        // Add header if provided
-        const headerKey = document.getElementById("request-header-key").value;
-        const headerValue = document.getElementById("request-header-value").value;
-        if (headerKey && headerValue) {
-            options.headers[headerKey] = headerValue;
+        // Add request body if method is POST, PUT, PATCH, or DELETE
+        if (["POST", "PUT", "PATCH", "DELETE"].includes(method)) {
+            const requestBody = getRequestBody(method);
+            if (requestBody) {
+                options.headers["Content-Type"] = "application/json";
+                options.body = requestBody;
+            }
         }
 
-        // Add request body if method is POST
-        if (method === "POST") {
-            const requestBody = document.getElementById("request-body").value;
-            options.headers["Content-Type"] = "application/json";
-            options.body = requestBody;
+        // Add request parameters if provided
+        const requestParams = getRequestParams();
+        if (requestParams) {
+            const queryString = new URLSearchParams(requestParams).toString();
+            fullUrl += fullUrl.includes("?") ? "&" + queryString : "?" + queryString;
         }
 
-        // Add query parameters if provided
-  
-       
-           let response = await fetch(fullUrl, options);
+        console.log("Full URL:", fullUrl); // Debug log
+
+        let response = await fetch(fullUrl, options);
         const contentType = response.headers.get("content-type");
 
-        let result;
+        let result = `Status: ${response.status} ${response.statusText}\n\n`;
+
         if (contentType && contentType.includes("application/json")) {
-            result = await response.json();
-            result = JSON.stringify(result, null, 2);
+            const jsonResult = await response.json();
+            result += JSON.stringify(jsonResult, null, 2);
         } else {
-            result = await response.text();
+            result += await response.text();
         }
 
         document.getElementById("response").innerText = result;
     } catch (error) {
-        document.getElementById("response").innerText = "Request Failed: " + error;
+        document.getElementById("response").innerText = `Request Failed: ${error.message}\n\nStack Trace:\n${error.stack}`;
     }
 }
 
+function getRequestParams() {
+    const paramInput = document.getElementById("request-param").value.trim();
+    if (!paramInput) return null;
+
+    const params = {};
+    paramInput.split('&').forEach(param => {
+        const [key, value] = param.split('=');
+        if (key && value) {
+            params[decodeURIComponent(key)] = decodeURIComponent(value);
+        }
+    });
+
+    return Object.keys(params).length > 0 ? params : null;
+}
+
 fetchAPIList();
+console.log("hello");
 
