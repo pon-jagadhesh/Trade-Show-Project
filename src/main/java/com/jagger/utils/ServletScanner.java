@@ -78,7 +78,7 @@ public class ServletScanner {
             for (Method method : declaredMethods) {
                 if (method.isAnnotationPresent(ApiParamGroup.class)) {
                     ApiParamGroup apiParamGroup = method.getAnnotation(ApiParamGroup.class);
-                    ApiParam[] entries = apiParamGroup.value(); // Use value() to get ApiParam array
+                    ApiParam[] entries = apiParamGroup.value(); 
     
                     for (ApiParam entry : entries) {
                         System.out.println("Key: " + entry.name() + ", Value: " + entry.type());
